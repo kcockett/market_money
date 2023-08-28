@@ -62,5 +62,13 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 end
 
-require "spec/support/factory_bot.rb"
+require "factory_bot_rails"
+Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 require "faker"
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
+end
