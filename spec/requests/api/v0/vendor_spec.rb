@@ -34,7 +34,7 @@ RSpec.describe "Vendors API", type: :request do
       vendor_found = response_data
 
       expect(response_data).to have_key(:errors)
-      expect(response_data[:errors].first[:detail]).to eq("Could not find Market with 'id'=9009009")
+      expect(response_data[:errors].first[:detail]).to eq("Could not find Vendor with 'id'=9009009")
     end
   end
   describe "5. POST /api/v0/vendors" do
@@ -74,7 +74,7 @@ RSpec.describe "Vendors API", type: :request do
       result = JSON.parse(response.body, symbolize_names: true)
 
       expect(result).to have_key(:errors)
-      expect(result[:errors].first[:detail]).to eq("Contact name can't be blank, Contact phone can't be blank")
+      expect(result[:errors].first[:detail]).to eq("Validation failed: Contact name can't be blank, Contact phone can't be blank")
     end
   end
   describe "6. PATCH /api/v0/vendors/:id" do
@@ -93,7 +93,20 @@ RSpec.describe "Vendors API", type: :request do
     end
 
     it "SAD PATH:  Expect 404 error if given an invalid vendor id" do
+      vendor = create(:vendor, credit_accepted: true)
+      old_name = vendor.name
+      new_name = "Brunhilda's fine herbs"
+      expect(Vendor.first.name).to eq(old_name)
+      expect(Vendor.first.credit_accepted).to eq(true)
       
+      patch "/api/v0/vendors/123123123123", params: { vendor: { name: new_name, credit_accepted: false } }.to_json, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+      result = JSON.parse(response.body, symbolize_names: true)
+      
+      expect(response).to_not be_successful
+      expect(result).to have_key(:errors)
+      expect(result[:errors].first[:detail]).to eq("Could not find Vendor with 'id'=123123123123")
+      expect(Vendor.first.name).to eq(old_name)
+      expect(Vendor.first.credit_accepted).to eq(true)
     end
   end
 end
