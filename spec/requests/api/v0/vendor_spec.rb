@@ -87,8 +87,13 @@ RSpec.describe "Vendors API", type: :request do
       
       patch "/api/v0/vendors/#{vendor.id}", params: { vendor: { name: new_name, credit_accepted: false } }.to_json, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
       
+      expect(response).to be_successful
       expect(Vendor.first.name).to eq(new_name)
       expect(Vendor.first.credit_accepted).to eq(false)
+    end
+
+    it "SAD PATH:  Expect 404 error if given an invalid vendor id" do
+      
     end
   end
 end
