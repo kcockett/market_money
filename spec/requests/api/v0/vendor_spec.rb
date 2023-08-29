@@ -92,7 +92,7 @@ RSpec.describe "Vendors API", type: :request do
       expect(Vendor.first.credit_accepted).to eq(false)
     end
 
-    it "SAD PATH:  Expect 404 error if given an invalid vendor id" do
+    it "SAD PATH ex2:  Expect 404 error if given an invalid vendor id" do
       vendor = create(:vendor, credit_accepted: true)
       old_name = vendor.name
       new_name = "Brunhilda's fine herbs"
@@ -101,12 +101,28 @@ RSpec.describe "Vendors API", type: :request do
       
       patch "/api/v0/vendors/123123123123", params: { vendor: { name: new_name, credit_accepted: false } }.to_json, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
       result = JSON.parse(response.body, symbolize_names: true)
-      
+
       expect(response).to_not be_successful
       expect(result).to have_key(:errors)
       expect(result[:errors].first[:detail]).to eq("Could not find Vendor with 'id'=123123123123")
       expect(Vendor.first.name).to eq(old_name)
       expect(Vendor.first.credit_accepted).to eq(true)
+    end
+
+    it "SAD PATH ex3 Expect 400 response if passing invalid data" do
+      vendor = create(:vendor, credit_accepted: true)
+      old_name = vendor.name
+      new_name = ""
+      expect(Vendor.first.name).to eq(old_name)
+      expect(Vendor.first.credit_accepted).to eq(true)
+      
+      patch "/api/v0/vendors/#{vendor.id}", params: { vendor: { name: new_name, credit_accepted: false } }.to_json, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+      result = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response).to_not be_successful
+      expect(result).to have_key(:errors)
+      expect(result[:errors].first[:detail]).to eq("Validation failed: Contact name can't be blank")
+      expect(Vendor.first.name).to eq(old_name)
     end
   end
 end
