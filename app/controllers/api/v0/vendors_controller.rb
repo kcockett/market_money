@@ -3,9 +3,11 @@ class Api::V0::VendorsController < ApplicationController
   
   def index
     market = Market.find(params[:market_id])
-    facade = VendorsFacade.new(market)
-    formatted_data = { data: facade.formatted_data }
-    render json: formatted_data
+    render json: VendorSerializer.new(market.vendors)
+  end
+
+  def show
+    render json: VendorSerializer.new(Vendor.find(params[:id]))
   end
 
   private
