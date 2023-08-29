@@ -77,4 +77,18 @@ RSpec.describe "Vendors API", type: :request do
       expect(result[:errors].first[:detail]).to eq("Contact name can't be blank, Contact phone can't be blank")
     end
   end
+  describe "6. PATCH /api/v0/vendors/:id" do
+    it "should allow updating an existing vendor" do
+      vendor = create(:vendor, credit_accepted: true)
+      old_name = vendor.name
+      new_name = "Brunhilda's fine herbs"
+      expect(Vendor.first.name).to eq(old_name)
+      expect(Vendor.first.credit_accepted).to eq(true)
+      
+      patch "/api/v0/vendors/#{vendor.id}", params: { vendor: { name: new_name, credit_accepted: false } }.to_json, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+      
+      expect(Vendor.first.name).to eq(new_name)
+      expect(Vendor.first.credit_accepted).to eq(false)
+    end
+  end
 end
