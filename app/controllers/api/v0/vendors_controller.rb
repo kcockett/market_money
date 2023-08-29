@@ -13,6 +13,7 @@ class Api::V0::VendorsController < ApplicationController
   private
   
   def record_not_found
-    render json: { "errors": [{"detail" => "Could not find Market with 'id'=#{params[:market_id]}"}] }, status: :not_found
+    id = params[:market_id] || params[:id]
+    render json: { "errors": [{"detail" => "Could not find Market with 'id'=#{id}"}] }, status: :not_found
   end
 end
