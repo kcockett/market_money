@@ -3,7 +3,7 @@ class VendorsFacade
     @market = market
   end
 
-  def formatted_data
+  def formatted_vendor_data
     @market.vendors.map do |vendor|
       {
         id: vendor.id.to_s,
