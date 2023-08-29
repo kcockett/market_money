@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Vendors", type: :request do
+RSpec.describe "Vendors API", type: :request do
   describe "4. GET /api/v0/vendors/:id" do
     it "should a single vendor by id" do
       vendor = create(:vendor)
@@ -35,6 +35,46 @@ RSpec.describe "Vendors", type: :request do
 
       expect(response_data).to have_key(:errors)
       expect(response_data[:errors].first[:detail]).to eq("Could not find Market with 'id'=9009009")
+    end
+  end
+  describe "5. POST /api/v0/vendors" do
+    it "should create a new vendor" do
+      vendor = attributes_for(:vendor)
+      vendor_data = vendor.to_json
+      post "/api/v0/vendors", params: vendor_data, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+      new_vendor = JSON.parse(response.body, symbolize_names: true)[:data]
+      
+      expect(response).to be_successful
+      expect(new_vendor).to have_key(:id)
+      expect(new_vendor[:id]).to be_a(String)
+
+      expect(new_vendor[:attributes]).to have_key(:name)
+      expect(new_vendor[:attributes][:name]).to eq("#{vendor[:name]}")
+
+      expect(new_vendor[:attributes]).to have_key(:description)
+      expect(new_vendor[:attributes][:description]).to eq("#{vendor[:description]}")
+
+      expect(new_vendor[:attributes]).to have_key(:contact_name)
+      expect(new_vendor[:attributes][:contact_name]).to eq("#{vendor[:contact_name]}")
+
+      expect(new_vendor[:attributes]).to have_key(:contact_phone)
+      expect(new_vendor[:attributes][:contact_phone]).to eq("#{vendor[:contact_phone]}")
+
+      expect(new_vendor[:attributes]).to have_key(:credit_accepted)
+      expect(new_vendor[:attributes][:credit_accepted].to_s).to eq("#{vendor[:credit_accepted]}")
+    end
+    it "SAD PATH: should return a 400 error if information is missing" do
+      vendor = {
+        "name": "Buzzy Bees",
+        "description": "local honey and wax products",
+        "credit_accepted": false
+      }
+      vendor_data = vendor.to_json
+      post "/api/v0/vendors", params: vendor_data, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+      result = JSON.parse(response.body, symbolize_names: true)
+
+      expect(result).to have_key(:errors)
+      expect(result[:errors].first[:detail]).to eq("Contact name can't be blank, Contact phone can't be blank")
     end
   end
 end
