@@ -111,18 +111,18 @@ RSpec.describe "Vendors API", type: :request do
 
     it "SAD PATH ex3 Expect 400 response if passing invalid data" do
       vendor = create(:vendor, credit_accepted: true)
-      old_name = vendor.name
+      old_contact_name = vendor.contact_name
       new_name = ""
-      expect(Vendor.first.name).to eq(old_name)
+      expect(Vendor.first.contact_name).to eq(old_contact_name)
       expect(Vendor.first.credit_accepted).to eq(true)
       
-      patch "/api/v0/vendors/#{vendor.id}", params: { vendor: { name: new_name, credit_accepted: false } }.to_json, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+      patch "/api/v0/vendors/#{vendor.id}", params: { vendor: { contact_name: new_name, credit_accepted: false } }.to_json, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
       result = JSON.parse(response.body, symbolize_names: true)
 
       expect(response).to_not be_successful
       expect(result).to have_key(:errors)
       expect(result[:errors].first[:detail]).to eq("Validation failed: Contact name can't be blank")
-      expect(Vendor.first.name).to eq(old_name)
+      expect(Vendor.first.contact_name).to eq(old_contact_name)
     end
   end
 end
