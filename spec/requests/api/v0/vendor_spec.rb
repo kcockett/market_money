@@ -27,5 +27,14 @@ RSpec.describe "Vendors", type: :request do
       expect(vendor_found[:attributes]).to have_key(:credit_accepted)
       expect(vendor_found[:attributes][:credit_accepted]).to be_a(TrueClass).or be_a(FalseClass)
     end
+    it "SAD PATH - should return an error when searching for invalid id" do
+      vendor = create(:vendor)
+      get "/api/v0/vendors/9009009"
+      response_data = JSON.parse(response.body, symbolize_names: true)
+      vendor_found = response_data
+
+      expect(response_data).to have_key(:errors)
+      expect(response_data[:errors].first[:detail]).to eq("Could not find Market with 'id'=9009009")
+    end
   end
 end
