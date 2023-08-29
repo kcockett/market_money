@@ -6,10 +6,4 @@ class VendorSerializer
             :contact_phone, 
             :credit_accepted
 
-  has_many :market_vendors
-  has_many :vendors, through: :market_vendors
-
-  attribute :type do
-    "vendor"
-  end
 end

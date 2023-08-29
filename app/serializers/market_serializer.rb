@@ -8,16 +8,9 @@ class MarketSerializer
             :zip, 
             :lat, 
             :lon
-
-  has_many :market_vendors
-  has_many :vendors, through: :market_vendors
-
-  attribute :type do
-    "market"
-  end
   
   attribute :vendor_count do |object|
-    object.vendor.count
+    object.vendors.count
   end
 
 end
