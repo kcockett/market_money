@@ -15,7 +15,7 @@ class Api::V0::VendorsController < ApplicationController
     if vendor.save
       render json: VendorSerializer.new(vendor), status: :created
     else
-      render_bad_request(vendor.errors)
+      render json: ErrorSerializer.serialize(vendor.errors), status: :bad_request
     end
   end
 
@@ -24,9 +24,9 @@ class Api::V0::VendorsController < ApplicationController
     if vendor.update(vendor_params)
       render json: VendorSerializer.new(vendor), status: :ok
     else
-      render_bad_request(vendor.errors)
+      render json: ErrorSerializer.serialize(vendor.errors), status: :bad_request
     end
-  end  
+  end
 
   private
 
@@ -36,21 +36,9 @@ class Api::V0::VendorsController < ApplicationController
   
   def handle_record_not_found
     if action_name == 'index'
-      market_not_found
+      render json: ErrorSerializer.not_found('Market', params[:market_id]), status: :not_found
     elsif action_name == 'show' || action_name == 'update'
-      vendor_not_found
+      render json: ErrorSerializer.not_found('Vendor', params[:id]), status: :not_found
     end
-  end
-
-  def market_not_found
-    render json: { "errors": [{"detail" => "Could not find Market with 'id'=#{params[:market_id]}" }] }, status: :not_found
-  end
-
-  def vendor_not_found
-    render json: { "errors": [{"detail" => "Could not find Vendor with 'id'=#{params[:id]}" }] }, status: :not_found
-  end
-
-  def render_bad_request(errors)
-    render json: { "errors": [{ "detail" => "Validation failed: #{errors.full_messages.join(', ')}" }] }, status: :bad_request
   end
 end
