@@ -125,4 +125,26 @@ RSpec.describe "Vendors API", type: :request do
       expect(Vendor.first.contact_name).to eq(old_contact_name)
     end
   end
+  describe "7. DELETE /api/v0/vendors/:id" do
+    it "when a valid id is passed in, that vendor will be destoryed as well as any associations that the vendor had.  A status code of 204 should be sent back without any content in the body" do
+      vendor = create(:vendor)
+      market = create(:market)
+      association = MarketVendor.create!(vendor_id: vendor.id, market_id: market.id)
+      expect(Vendor.first).to eq(vendor)
+      expect(Market.first).to eq(market)
+      expect(MarketVendor.first).to eq(association)
+      
+      delete "/api/v0/vendors/#{vendor.id}"
+      require 'pry'; binding.pry
+      
+      expect(response).to be_successful
+      expect(Vendor.first.name).to eq(nil)
+      expect(Market.first.name).to eq(market.name)
+      expect(MarketVendor.first).to eq(nil)
+    end
+
+    it "SAD PATH If an invalid id is passed in, a 404 status code as well as a descriptive message should be sent back with the response" do
+      #
+    end
+  end
 end
