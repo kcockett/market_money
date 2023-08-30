@@ -153,7 +153,7 @@ RSpec.describe "Vendors API", type: :request do
       delete "/api/v0/vendors/123123123123"
       result = JSON.parse(response.body, symbolize_names: true)
 
-      expect(result[:errors].first[:detail]).to eq("Couldn't find Vendor with 'id'=123123123123")
+      expect(result[:errors].first[:detail]).to eq("Could not find Vendor with 'id'=123123123123")
       expect(response).to_not be_successful
       expect(Vendor.first).to eq(vendor)
       expect(Market.first).to eq(market)

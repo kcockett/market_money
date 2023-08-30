@@ -44,7 +44,7 @@ class Api::V0::VendorsController < ApplicationController
   def handle_record_not_found
     if action_name == 'index'
       render json: ErrorSerializer.not_found('Market', params[:market_id]), status: :not_found
-    elsif action_name == 'show' || action_name == 'update'
+    elsif action_name == 'show' || action_name == 'update' || action_name == 'destroy'
       render json: ErrorSerializer.not_found('Vendor', params[:id]), status: :not_found
     end
   end
