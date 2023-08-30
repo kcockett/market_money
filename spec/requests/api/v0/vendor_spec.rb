@@ -74,7 +74,7 @@ RSpec.describe "Vendors API", type: :request do
       result = JSON.parse(response.body, symbolize_names: true)
 
       expect(result).to have_key(:errors)
-      expect(result[:errors].first[:detail]).to eq("Validation failed: Contact name can't be blank, Contact phone can't be blank")
+      expect(result[:errors].first[:detail]).to eq("Validation failed, Contact name can't be blank, Contact phone can't be blank")
     end
   end
   describe "6. PATCH /api/v0/vendors/:id" do
@@ -121,7 +121,7 @@ RSpec.describe "Vendors API", type: :request do
 
       expect(response).to_not be_successful
       expect(result).to have_key(:errors)
-      expect(result[:errors].first[:detail]).to eq("Validation failed: Contact name can't be blank")
+      expect(result[:errors].first[:detail]).to eq("Validation failed, Contact name can't be blank")
       expect(Vendor.first.contact_name).to eq(old_contact_name)
     end
   end

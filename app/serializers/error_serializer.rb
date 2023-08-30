@@ -18,7 +18,7 @@ class ErrorSerializer
       {
         errors: [
           {
-            detail: "Validation failed: #{full_messages}"
+            detail: "Validation failed, #{full_messages}"
           }
         ]
       }

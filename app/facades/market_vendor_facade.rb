@@ -1,43 +1,57 @@
 class MarketVendorFacade
+  attr_reader :errors, :status
+
   def initialize(params)
     @params = params
+    @errors = []
+    @status = :bad_request
   end
 
   def create
-    if valid_params? # Verify both paramaters were sent in the request
-      
-      vendor = Vendor.find_by(id: @params[:vendor_id]) # Find the Vendor
-      market = Market.find_by(id: @params[:market_id]) # Find the Market
+    unless valid_params?
+      set_error_messages
+      return false
+    end
 
-      if vendor && market # Check if both were found
-        market_vendor = MarketVendor.new(vendor: vendor, market: market) # If both found, create the object
-        if market_vendor.save
-          return { message: "Successfully added vendor to market" }, :created
-        else
-          return ErrorSerializer.serialize(market_vendor.errors), :bad_request
-        end
+    vendor = Vendor.find_by(id: @params[:vendor_id])
+    market = Market.find_by(id: @params[:market_id])
+
+    if vendor && market
+      market_vendor = MarketVendor.new(vendor: vendor, market: market)
+      if market_vendor.save
+        @status = :created
+        return true
       else
-        set_error_messages(vendor, market)
-        return ErrorSerializer.serialize(@errors.join(', ')), :not_found
+        @errors = market_vendor.errors
       end
     else
-      return ErrorSerializer.serialize("Missing parameter: #{@missing_params.join(', ')}"), :bad_request
+      set_error_messages(vendor, market)
     end
+
+    false
+  end
+
+  def market_vendor_exists?
+    market_id = @params[:market_id]
+    vendor_id = @params[:vendor_id]
+    MarketVendor.exists?(market_id: market_id, vendor_id: vendor_id)
   end
 
   private
 
-  def valid_params? 
-    @missing_params = []
-    @missing_params << "vendor_id" unless @params[:vendor_id].present?
-    @missing_params << "market_id" unless @params[:market_id].present?
-    @missing_params.empty?
+  def valid_params?
+    @params[:vendor_id].present? && @params[:market_id].present?
   end
 
   def set_error_messages(vendor = nil, market = nil)
-    @errors = ["Validation failed"]
-    @errors << "Vendor must exist" unless vendor
-    @errors << "Market must exist" unless market
-    @status = :not_found
+    if !@params[:vendor_id].present? || !@params[:market_id].present?
+      @errors = ["Missing parameter: vendor_id"] unless @params[:vendor_id].present?
+      @errors = ["Missing parameter: market_id"] unless @params[:market_id].present?
+      @status = :bad_request
+    else
+      @errors << "Vendor must exist" unless vendor
+      @errors << "Market must exist" unless market
+      @status = :not_found
+    end
   end
 end
