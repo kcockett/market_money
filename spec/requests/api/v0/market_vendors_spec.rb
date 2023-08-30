@@ -20,5 +20,29 @@ RSpec.describe "MarketVendors API", type: :request do
 
       expect(new_vendor[:id]).to eq("#{vendor.id}")
     end
+
+    it "SAD PATH ex2 If an invalid vendor id or and invalid market id is passed in, a 404 status code as well as a descriptive message should be sent back with the response." do
+      vendor = create(:vendor)
+      market = create(:market)
+      params = { vendor_id: vendor.id, market_id: 987654321 }.to_json
+
+      post "/api/v0/market_vendors", params: params, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+      creation_response = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response).to_not be_successful
+      expect(response.status).to eq(404)
+      expect(creation_response[:message]).to eq("Validation failed: Market must exist")
+
+      vendor = create(:vendor)
+      market = create(:market)
+      params = { vendor_id: 987654321, market_id: market.id }.to_json
+
+      post "/api/v0/market_vendors", params: params, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+      creation_response = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response).to_not be_successful
+      expect(response.status).to eq(404)
+      expect(creation_response[:message]).to eq("Validation failed: Vendor must exist")
+    end
   end
 end
