@@ -8,17 +8,11 @@ RSpec.describe "MarketVendors API", type: :request do
       params = { vendor_id: vendor.id, market_id: market.id }.to_json
 
       post "/api/v0/market_vendors", params: params, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
-      new_market_vendor = JSON.parse(response.body, symbolize_names: true)[:data]
-      
+      feedback = JSON.parse(response.body, symbolize_names: true)
+
       expect(response).to be_successful
-      expect(new_market_vendor).to have_key(:id)
-      expect(new_market_vendor[:id]).to be_a(String)
-
-      expect(new_market_vendor[:attributes]).to have_key(:vendor_id)
-      expect(new_market_vendor[:attributes][:vendor_id]).to eq(vendor.id)
-
-      expect(new_market_vendor[:attributes]).to have_key(:market_id)
-      expect(new_market_vendor[:attributes][:market_id]).to eq(market.id)
+      expect(response.status).to eq(201)
+      expect(feedback[:message]).to eq("Successfully added vendor to market")
 
       expect(MarketVendor.first.vendor_id).to eq(vendor.id)
       expect(MarketVendor.first.market_id).to eq(market.id)
