@@ -28,6 +28,13 @@ class Api::V0::VendorsController < ApplicationController
     end
   end
 
+  def destroy
+    vendor = Vendor.find(params[:id])
+    vendor.market_vendors.destroy_all
+    vendor.destroy
+    head :no_content
+  end
+
   private
 
   def vendor_params

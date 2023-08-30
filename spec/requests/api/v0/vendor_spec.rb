@@ -135,11 +135,10 @@ RSpec.describe "Vendors API", type: :request do
       expect(MarketVendor.first).to eq(association)
       
       delete "/api/v0/vendors/#{vendor.id}"
-      require 'pry'; binding.pry
       
       expect(response).to be_successful
-      expect(Vendor.first.name).to eq(nil)
-      expect(Market.first.name).to eq(market.name)
+      expect(Vendor.first).to eq(nil)
+      expect(Market.first).to eq(market)
       expect(MarketVendor.first).to eq(nil)
     end
 
