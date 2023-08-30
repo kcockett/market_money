@@ -9,7 +9,12 @@ class ErrorSerializer
         ]
       }
     else
-      full_messages = errors.full_messages.join(', ')
+      if errors.is_a?(Array)
+        full_messages = errors.join(', ')
+      else
+        full_messages = errors.full_messages.join(', ')
+      end
+      
       {
         errors: [
           {
@@ -21,6 +26,12 @@ class ErrorSerializer
   end
 
   def self.not_found(entity, id)
-    serialize("Could not find #{entity} with 'id'=#{id}")
+    {
+      errors: [
+        {
+          detail: "Could not find #{entity} with 'id'=#{id}"
+        }
+      ]
+    }
   end
 end

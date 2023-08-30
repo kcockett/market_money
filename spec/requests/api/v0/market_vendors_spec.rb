@@ -58,7 +58,7 @@ RSpec.describe "MarketVendors API", type: :request do
 
       expect(response).to_not be_successful
       expect(response.status).to eq(400)
-      expect(creation_response[:errors][0][:detail]).to eq("Validation failed: Missing Vendor id")
+      expect(creation_response[:errors][0][:detail]).to eq("Missing parameter: vendor_id")
 
       # Do not send market_id
       params = { vendor_id: vendor.id }.to_json
@@ -68,7 +68,7 @@ RSpec.describe "MarketVendors API", type: :request do
 
       expect(response).to_not be_successful
       expect(response.status).to eq(400)
-      expect(creation_response[:errors][0][:detail]).to eq("Validation failed: Missing Market id")
+      expect(creation_response[:errors][0][:detail]).to eq("Missing parameter: market_id")
     end
   end
 end
