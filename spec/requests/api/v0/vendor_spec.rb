@@ -143,7 +143,21 @@ RSpec.describe "Vendors API", type: :request do
     end
 
     it "SAD PATH If an invalid id is passed in, a 404 status code as well as a descriptive message should be sent back with the response" do
-      #
+      vendor = create(:vendor)
+      market = create(:market)
+      association = MarketVendor.create!(vendor_id: vendor.id, market_id: market.id)
+      expect(Vendor.first).to eq(vendor)
+      expect(Market.first).to eq(market)
+      expect(MarketVendor.first).to eq(association)
+      
+      delete "/api/v0/vendors/123123123123"
+      result = JSON.parse(response.body, symbolize_names: true)
+
+      expect(result[:errors].first[:detail]).to eq("Couldn't find Vendor with 'id'=123123123123")
+      expect(response).to_not be_successful
+      expect(Vendor.first).to eq(vendor)
+      expect(Market.first).to eq(market)
+      expect(MarketVendor.first).to eq(association)
     end
   end
 end
