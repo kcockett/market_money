@@ -32,9 +32,7 @@ class MarketVendorFacade
   end
 
   def market_vendor_exists?
-    market_id = @params[:market_id]
-    vendor_id = @params[:vendor_id]
-    MarketVendor.exists?(market_id: market_id, vendor_id: vendor_id)
+    MarketVendor.exists?(market_id: @params[:market_id], vendor_id: @params[:vendor_id])
   end
 
   private
