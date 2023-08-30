@@ -8,8 +8,6 @@ RSpec.describe "MarketVendors API", type: :request do
       params = { vendor_id: vendor.id, market_id: market.id }.to_json
 
       post "/api/v0/market_vendors", params: params, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
-
-
       new_market_vendor = JSON.parse(response.body, symbolize_names: true)[:data]
       
       expect(response).to be_successful

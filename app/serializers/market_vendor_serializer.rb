@@ -3,4 +3,5 @@ class MarketVendorSerializer
   attributes :market_id, 
             :vendor_id
 
+  
 end
