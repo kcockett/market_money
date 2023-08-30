@@ -29,10 +29,10 @@ RSpec.describe "MarketVendors API", type: :request do
 
       post "/api/v0/market_vendors", params: params, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
       creation_response = JSON.parse(response.body, symbolize_names: true)
-
+      
       expect(response).to_not be_successful
       expect(response.status).to eq(404)
-      expect(creation_response[:errors][0][:detail]).to eq("Validation failed: Market must exist")
+      expect(creation_response[:errors][0][:detail]).to eq("Validation failed, Market must exist")
 
       vendor = create(:vendor)
       market = create(:market)
@@ -44,7 +44,7 @@ RSpec.describe "MarketVendors API", type: :request do
 
       expect(response).to_not be_successful
       expect(response.status).to eq(404)
-      expect(creation_response[:errors][0][:detail]).to eq("Validation failed: Vendor must exist")
+      expect(creation_response[:errors][0][:detail]).to eq("Validation failed, Vendor must exist")
     end
 
     it "SAD PATH ex2.b If a vendor id and/or a market id are not passed in, a 400 status code as well as a descriptive message should be sent back with the response." do
