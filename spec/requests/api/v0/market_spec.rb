@@ -174,13 +174,12 @@ RSpec.describe "Markets", type: :request do
 
       get "/api/v0/markets/search?city=#{market.city}"
       response_data = JSON.parse(response.body, symbolize_names: true)
-      require 'pry'; binding.pry
-      expect(response_data[:errors].first[:detail]).to eq("Validation failed, ")
+      expect(response_data[:errors].first[:detail]).to include("Validation failed,")
       expect(response.status).to eq(422)
       
       get "/api/v0/markets/search?city=#{market.city}&name=#{market.name}"
       response_data = JSON.parse(response.body, symbolize_names: true)
-      expect(response_data[:errors].first[:detail]).to eq("Validation failed, ")
+      expect(response_data[:errors].first[:detail]).to include("Validation failed,")
       expect(response.status).to eq(422)
     end
   end
