@@ -92,4 +92,27 @@ RSpec.describe "MarketVendors API", type: :request do
       expect(duplicate_response[:errors][0][:detail]).to eq("Validation failed, Association already exists")
     end
   end
+
+  describe "9. DELETE /api/v0/market_vendors" do
+    it "should destroy an existing association between a market and a vendor (so that a vendor no longer is listed at a certain market)" do
+      vendor = create(:vendor)
+      market = create(:market)
+      params = { vendor_id: vendor.id, market_id: market.id }.to_json
+
+      post "/api/v0/market_vendors", params: params, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+      creation_response = JSON.parse(response.body, symbolize_names: true)
+      expect(response).to be_successful
+      expect(response.status).to eq(201)
+      expect(creation_response[:message]).to eq("Successfully added vendor to market")
+      expect(MarketVendor.first.vendor_id).to eq(vendor.id)
+      expect(MarketVendor.first.market_id).to eq(market.id)
+
+      delete "/api/v0/market_vendors", params: params, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+      delete_response = JSON.parse(response.body, symbolize_names: true)
+      expect(response).to be_successful
+      expect(response.status).to eq(204)
+      expect(creation_response[:message]).to eq("Successfully removed vendor from market")
+      expect(MarketVendor.first).to eq(nil)
+    end
+  end
 end
