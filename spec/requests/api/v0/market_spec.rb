@@ -168,5 +168,20 @@ RSpec.describe "Markets", type: :request do
       expect(response_data.first[:attributes][:name]).to eq(market.name)
       expect(response.status).to eq(200)
     end
+
+    it "SAD PATH ex2 The following combination of parameters can NOT be sent in at any time: [city], [city, name].  If an invalid set of parameters are sent in, a proper error message should be sent back, along with a 422 status code." do
+      market = create(:market)
+
+      get "/api/v0/markets/search?city=#{market.city}"
+      response_data = JSON.parse(response.body, symbolize_names: true)
+      require 'pry'; binding.pry
+      expect(response_data[:errors].first[:detail]).to eq("Validation failed, ")
+      expect(response.status).to eq(422)
+      
+      get "/api/v0/markets/search?city=#{market.city}&name=#{market.name}"
+      response_data = JSON.parse(response.body, symbolize_names: true)
+      expect(response_data[:errors].first[:detail]).to eq("Validation failed, ")
+      expect(response.status).to eq(422)
+    end
   end
 end
