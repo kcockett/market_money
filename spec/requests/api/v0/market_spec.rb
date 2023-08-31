@@ -138,4 +138,49 @@ RSpec.describe "Markets", type: :request do
       expect(vendors[:errors].first[:detail]).to eq("Could not find Market with 'id'=9009009")
     end
   end
+
+  describe "6. GET /api/v0/markets/search" do
+    it "should return a response 200 with the market data if these datasets match: [state], [state, city], [state, city, name], [state, name], [name]" do
+      market = create(:market)
+
+      get "/api/v0/markets/search?state=#{market.state}"
+      response_data = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(response_data.first[:attributes][:name]).to eq(market.name)
+      expect(response.status).to eq(200)
+      
+      get "/api/v0/markets/search?state=#{market.state}&city=#{market.city}"
+      response_data = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(response_data.first[:attributes][:name]).to eq(market.name)
+      expect(response.status).to eq(200)
+      
+      get "/api/v0/markets/search?state=#{market.state}&city=#{market.city}&name=#{market.name}"
+      response_data = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(response_data.first[:attributes][:name]).to eq(market.name)
+      expect(response.status).to eq(200)
+
+      get "/api/v0/markets/search?state=#{market.state}&name=#{market.name}"
+      response_data = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(response_data.first[:attributes][:name]).to eq(market.name)
+      expect(response.status).to eq(200)
+
+      get "/api/v0/markets/search?name=#{market.name}"
+      response_data = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(response_data.first[:attributes][:name]).to eq(market.name)
+      expect(response.status).to eq(200)
+    end
+
+    it "SAD PATH ex2 The following combination of parameters can NOT be sent in at any time: [city], [city, name].  If an invalid set of parameters are sent in, a proper error message should be sent back, along with a 422 status code." do
+      market = create(:market)
+
+      get "/api/v0/markets/search?city=#{market.city}"
+      response_data = JSON.parse(response.body, symbolize_names: true)
+      expect(response_data[:errors].first[:detail]).to include("Validation failed,")
+      expect(response.status).to eq(422)
+      
+      get "/api/v0/markets/search?city=#{market.city}&name=#{market.name}"
+      response_data = JSON.parse(response.body, symbolize_names: true)
+      expect(response_data[:errors].first[:detail]).to include("Validation failed,")
+      expect(response.status).to eq(422)
+    end
+  end
 end
