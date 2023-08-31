@@ -145,28 +145,28 @@ RSpec.describe "Markets", type: :request do
 
       get "/api/v0/markets/search?state=#{market.state}"
       response_data = JSON.parse(response.body, symbolize_names: true)[:data]
-      expect(response_data).to eq(market.to_json)
-      expect(response.status).to eq("200")
+      expect(response_data.first[:attributes][:name]).to eq(market.name)
+      expect(response.status).to eq(200)
       
       get "/api/v0/markets/search?state=#{market.state}&city=#{market.city}"
       response_data = JSON.parse(response.body, symbolize_names: true)[:data]
-      expect(response_data).to eq(market.to_json)
-      expect(response.status).to eq("200")
+      expect(response_data.first[:attributes][:name]).to eq(market.name)
+      expect(response.status).to eq(200)
       
       get "/api/v0/markets/search?state=#{market.state}&city=#{market.city}&name=#{market.name}"
       response_data = JSON.parse(response.body, symbolize_names: true)[:data]
-      expect(response_data).to eq(market.to_json)
-      expect(response.status).to eq("200")
+      expect(response_data.first[:attributes][:name]).to eq(market.name)
+      expect(response.status).to eq(200)
 
       get "/api/v0/markets/search?state=#{market.state}&name=#{market.name}"
       response_data = JSON.parse(response.body, symbolize_names: true)[:data]
-      expect(response_data).to eq(market.to_json)
-      expect(response.status).to eq("200")
+      expect(response_data.first[:attributes][:name]).to eq(market.name)
+      expect(response.status).to eq(200)
 
       get "/api/v0/markets/search?name=#{market.name}"
       response_data = JSON.parse(response.body, symbolize_names: true)[:data]
-      expect(response_data).to eq(market.to_json)
-      expect(response.status).to eq("200")
+      expect(response_data.first[:attributes][:name]).to eq(market.name)
+      expect(response.status).to eq(200)
     end
   end
 end
