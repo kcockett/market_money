@@ -34,4 +34,14 @@ class ErrorSerializer
       ]
     }
   end
+
+  def self.market_not_found(id)
+    {
+      errors: [
+        {
+          detail: "Market with id=#{id} not found"
+        }
+      ]
+    }
+  end
 end
