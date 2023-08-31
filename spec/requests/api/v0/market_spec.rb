@@ -138,4 +138,35 @@ RSpec.describe "Markets", type: :request do
       expect(vendors[:errors].first[:detail]).to eq("Could not find Market with 'id'=9009009")
     end
   end
+
+  describe "6. GET /api/v0/markets/search" do
+    it "should return a response 200 with the market data if these datasets match: [state], [state, city], [state, city, name], [state, name], [name]" do
+      market = create(:market)
+
+      get "/api/v0/markets/search?state=#{market.state}"
+      response_data = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(response_data).to eq(market.to_json)
+      expect(response.status).to eq("200")
+      
+      get "/api/v0/markets/search?state=#{market.state}&city=#{market.city}"
+      response_data = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(response_data).to eq(market.to_json)
+      expect(response.status).to eq("200")
+      
+      get "/api/v0/markets/search?state=#{market.state}&city=#{market.city}&name=#{market.name}"
+      response_data = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(response_data).to eq(market.to_json)
+      expect(response.status).to eq("200")
+
+      get "/api/v0/markets/search?state=#{market.state}&name=#{market.name}"
+      response_data = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(response_data).to eq(market.to_json)
+      expect(response.status).to eq("200")
+
+      get "/api/v0/markets/search?name=#{market.name}"
+      response_data = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(response_data).to eq(market.to_json)
+      expect(response.status).to eq("200")
+    end
+  end
 end
