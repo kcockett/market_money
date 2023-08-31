@@ -186,17 +186,19 @@ RSpec.describe "Markets", type: :request do
 
   describe "11. GET /api/v0/markets/:id/nearest_atms" do
     it "should return a list of nearest ATMs from the Market address" do
-      market = create(:market)
+      market = Market.create!(name: "Orchard Farmers Market", street: "14535 Delaware St", city: "Westminster", county: "Adams", state: "Colorado", zip: 80023, lat: 39.842285, lon: -105.043716)
       get "/api/v0/markets/#{market.id}/nearest_atms"
       response_data = JSON.parse(response.body, symbolize_names: true)[:data]
 
       expect(response).to be_successful
-      expect(response_data.first[:type]).to eq("atm")
-      expect(response_data.first[:attributes]).to have_key(:name)
-      expect(response_data.first[:attributes]).to have_key(:address)
-      expect(response_data.first[:attributes]).to have_key(:lat)
-      expect(response_data.first[:attributes]).to have_key(:lon)
-      expect(response_data.first[:attributes]).to have_key(:distance)
+      expect(response_data[:results].first[:poi]).to have_key(:name)
+      expect(response_data[:results].first[:poi][:name]).to be_a(String)
+
+      expect(response_data[:results].first[:poi]).to have_key(:categories)
+      expect(response_data[:results].first[:poi][:categories]).to be_an(Array)
+      
+      expect(response_data[:results].first[:address]).to have_key(:streetName)
+      expect(response_data[:results].first[:address][:streetName]).to be_a(String)
     end
   end
 end

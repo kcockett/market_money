@@ -10,6 +10,9 @@ Rails.application.routes.draw do
         collection do
           get 'search', to: 'markets#search'
         end
+        member do
+          get 'nearest_atms', to: 'markets#nearest_atms'
+        end
         resources :vendors, only: [:index]
       end
       resources :vendors, only: [:show, :create, :update, :destroy]

@@ -19,6 +19,17 @@ class Api::V0::MarketsController < ApplicationController
     end
   end
 
+  def nearest_atms
+    market = Market.find(params[:id])
+    facade = MarketsFacade.new(market)
+
+    if facade.fetch_nearest_atms
+      render json: { data: facade.atms }, status: :ok
+    else
+      render_error(facade.errors, facade.status)
+    end
+  end
+
   private
   
   def record_not_found
@@ -31,5 +42,9 @@ class Api::V0::MarketsController < ApplicationController
 
   def search_params
     params.permit(:city, :state, :name)
+  end
+
+  def render_market_not_found(id)
+    render json: ErrorSerializer.market_not_found(id), status: :not_found
   end
 end
