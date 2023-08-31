@@ -78,7 +78,6 @@ RSpec.describe "MarketVendors API", type: :request do
 
       post "/api/v0/market_vendors", params: params, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
       creation_response = JSON.parse(response.body, symbolize_names: true)
-
       expect(response).to be_successful
       expect(response.status).to eq(201)
       expect(creation_response[:message]).to eq("Successfully added vendor to market")
@@ -86,10 +85,42 @@ RSpec.describe "MarketVendors API", type: :request do
       post "/api/v0/market_vendors", params: params, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
       duplicate_response = JSON.parse(response.body, symbolize_names: true)
 
-      
       expect(response).to_not be_successful
       expect(response.status).to eq(422)
       expect(duplicate_response[:errors][0][:detail]).to eq("Validation failed, Association already exists")
+    end
+  end
+
+  describe "9. DELETE /api/v0/market_vendors" do
+    it "should destroy an existing association between a market and a vendor (so that a vendor no longer is listed at a certain market).  When a MarketVendor resource can be found with the passed in vendor_id and market_id, that resource should be destroyed, and a response will be sent back with a 204 status, with nothing returned in the body of the request." do
+      vendor = create(:vendor)
+      market = create(:market)
+      params = { vendor_id: vendor.id, market_id: market.id }.to_json
+      post "/api/v0/market_vendors", params: params, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+      creation_response = JSON.parse(response.body, symbolize_names: true)
+      expect(response).to be_successful
+      expect(response.status).to eq(201)
+      expect(creation_response[:message]).to eq("Successfully added vendor to market")
+      expect(MarketVendor.first.vendor_id).to eq(vendor.id)
+      expect(MarketVendor.first.market_id).to eq(market.id)
+
+      delete "/api/v0/market_vendors", params: params, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+      expect(response).to be_successful
+      expect(response.status).to eq(204)
+      expect(response.body).to eq("")
+      expect(MarketVendor.first).to eq(nil)
+    end
+
+    it "SAD PATH If a MarketVendor resource can NOT be found with the passed in vendor_id and market_id, a 404 status code as well as a descriptive message should be sent back with the response." do
+      vendor = create(:vendor)
+      market = create(:market)
+      params = { vendor_id: vendor.id, market_id: market.id }.to_json
+      delete "/api/v0/market_vendors", params: params, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+      deletion_response = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response).to_not be_successful
+      expect(response.status).to eq(404)
+      expect(deletion_response[:errors][0][:detail]).to eq("No record with market_id=#{market.id} AND vendor_id=#{vendor.id} exists")
     end
   end
 end

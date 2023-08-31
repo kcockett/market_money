@@ -31,9 +31,32 @@ class MarketVendorFacade
     false
   end
 
-  def market_vendor_exists?
-    MarketVendor.exists?(market_id: @params[:market_id], vendor_id: @params[:vendor_id])
+  
+
+  def destroy
+    vendor_id = @params[:vendor_id]
+    market_id = @params[:market_id]
+  
+    @market_vendor = MarketVendor.find_by(vendor_id: vendor_id, market_id: market_id)
+    
+    if @market_vendor
+      @market_vendor.destroy
+      true
+    else
+      set_not_found_error("record", "market_id=#{market_id} AND vendor_id=#{vendor_id}")
+      false
+    end
   end
+  
+  def market_vendor_exists?
+    @market_vendor.present?
+  end
+  
+  def set_not_found_error(entity, details)
+    @errors = "No #{entity} with #{details} exists"
+    @status = :not_found
+  end
+  
 
   private
 

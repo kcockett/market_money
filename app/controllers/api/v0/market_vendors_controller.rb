@@ -1,11 +1,20 @@
 class Api::V0::MarketVendorsController < ApplicationController
   def create
     facade = MarketVendorFacade.new(market_vendor_params)
-
-    if facade.market_vendor_exists?
+    if MarketVendor.exists?(market_id: params[:market_id], vendor_id: params[:vendor_id])
       render_error(["Association already exists"], :unprocessable_entity)
     elsif facade.create
       render json: { message: "Successfully added vendor to market" }, status: facade.status
+    else
+      render_error(facade.errors, facade.status)
+    end
+  end
+
+  def destroy
+    facade = MarketVendorFacade.new(market_vendor_params)
+  
+    if facade.destroy
+      head :no_content
     else
       render_error(facade.errors, facade.status)
     end
