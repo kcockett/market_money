@@ -108,11 +108,19 @@ RSpec.describe "MarketVendors API", type: :request do
       expect(MarketVendor.first.market_id).to eq(market.id)
 
       delete "/api/v0/market_vendors", params: params, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
-      delete_response = JSON.parse(response.body, symbolize_names: true)
+      
       expect(response).to be_successful
       expect(response.status).to eq(204)
-      expect(creation_response[:message]).to eq("Successfully removed vendor from market")
       expect(MarketVendor.first).to eq(nil)
+    end
+
+    it "SAD PATH If a MarketVendor resource can NOT be found with the passed in vendor_id and market_id, a 404 status code as well as a descriptive message should be sent back with the response." do
+      delete "/api/v0/market_vendors", params: params, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
+      deletion_response = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response).to_not be_successful
+      expect(response.status).to eq(404)
+      expect(deletion_response[:message]).to eq("No MarketVendor with market_id=4233 AND vendor_id=11520 exists")
     end
   end
 end

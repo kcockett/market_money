@@ -11,6 +11,16 @@ class Api::V0::MarketVendorsController < ApplicationController
     end
   end
 
+  def destroy
+    facade = MarketVendorFacade.new(market_vendor_params)
+
+    if facade.destroy
+      head :no_content
+    else
+      render_error(facade.errors, facade.status)
+    end
+  end
+
   private
 
   def market_vendor_params

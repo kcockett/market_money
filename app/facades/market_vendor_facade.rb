@@ -35,6 +35,21 @@ class MarketVendorFacade
     MarketVendor.exists?(market_id: @params[:market_id], vendor_id: @params[:vendor_id])
   end
 
+  def destroy
+    vendor_id = @params[:vendor_id]
+    market_id = @params[:market_id]
+
+    market_vendor = MarketVendor.find_by(vendor_id: vendor_id, market_id: market_id)
+    
+    if market_vendor
+      market_vendor.destroy
+      return true
+    else
+      set_error_messages(["Association not found"], :not_found)
+      return false
+    end
+  end
+
   private
 
   def valid_params?
