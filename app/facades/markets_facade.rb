@@ -1,4 +1,3 @@
-# app/facades/markets_facade.rb
 class MarketsFacade
   attr_reader :atms, :errors, :status
   def initialize(market)
@@ -8,10 +7,7 @@ class MarketsFacade
     @status = :internal_server_error
   end
 
-  def formatted_data
-    return self.array_format if @markets.count > 1
-    self.single_format
-  end
+  
 
   def array_format
     @markets.map do |market|
@@ -74,8 +70,13 @@ class MarketsFacade
       @atms = JSON.parse(response.body)
       @status = :ok
       true
+    elsif response.status == 404
+      @errors = ["Market not found"]
+      @status = :not_found
+      false
     else
       @errors = ["Error fetching ATMs"]
+      @status = :internal_server_error
       false
     end
   end
