@@ -200,5 +200,12 @@ RSpec.describe "Markets", type: :request do
       expect(response_data[:results].first[:address]).to have_key(:streetName)
       expect(response_data[:results].first[:address][:streetName]).to be_a(String)
     end
+    it "SAD PATH 404 error" do
+      get "/api/v0/markets/10101010/nearest_atms"
+      response_data = JSON.parse(response.body, symbolize_names: true)
+      expect(response).to_not be_successful
+      expect(response_data).to have_key(:errors)
+      expect(response_data[:errors].first[:detail]).to include("Could not find Market")
+    end
   end
 end
