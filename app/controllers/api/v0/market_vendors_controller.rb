@@ -17,12 +17,12 @@ class Api::V0::MarketVendorsController < ApplicationController
   end
 
   def destroy
-    facade = MarketVendorFacade.new(market_vendor_params)
-  
-    if facade.destroy
+    begin
+      market_vendor = MarketVendor.find_by(vendor_id: market_vendor_params[:vendor_id], market_id: market_vendor_params[:market_id])
+      market_vendor.destroy
       head :no_content
-    else
-      render json: ErrorSerializer.serialize(facade.errors), status: :not_found
+    rescue
+      render json: ErrorSerializer.serialize("No record with market_id=#{market_vendor_params[:market_id]} AND vendor_id=#{market_vendor_params[:vendor_id]} exists"), status: :not_found
     end
   end
 

@@ -117,7 +117,6 @@ RSpec.describe "MarketVendors API", type: :request do
       params = { vendor_id: vendor.id, market_id: market.id }.to_json
       delete "/api/v0/market_vendors", params: params, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
       deletion_response = JSON.parse(response.body, symbolize_names: true)
-
       expect(response).to_not be_successful
       expect(response.status).to eq(404)
       expect(deletion_response[:errors][0][:detail]).to eq("No record with market_id=#{market.id} AND vendor_id=#{vendor.id} exists")
