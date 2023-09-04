@@ -45,7 +45,7 @@ class Api::V0::MarketsController < ApplicationController
   end
 
   def record_not_found
-    render json: ErrorSerializer.not_found('Market', params[:market_id]), status: :not_found
+    render json: ErrorSerializer.serialize("Couldn't find Market with 'id'=#{params[:id]}"), status: :not_found
   end
 
   def render_error(errors, status)

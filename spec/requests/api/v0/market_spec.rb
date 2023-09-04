@@ -137,11 +137,11 @@ RSpec.describe "Markets", type: :request do
       vendors.each do |vendor|
         MarketVendor.create!(market_id: market.id, vendor_id: vendor.id)
       end
-      get "/api/v0/markets/9009009/vendors"
+      get "/api/v0/markets/123123123123/vendors"
       vendors = JSON.parse(response.body, symbolize_names: true)
       
       expect(vendors).to have_key(:errors)
-      expect(vendors[:errors].first[:detail]).to eq("Could not find Market with 'id'=9009009")
+      expect(vendors[:errors].first[:detail]).to eq("Couldn't find Market with 'id'=123123123123")
     end
   end
 
@@ -207,11 +207,11 @@ RSpec.describe "Markets", type: :request do
       expect(response_data[:results].first[:address][:streetName]).to be_a(String)
     end
     it "SAD PATH 404 error" do
-      get "/api/v0/markets/10101010/nearest_atms"
+      get "/api/v0/markets/123123123123/nearest_atms"
       response_data = JSON.parse(response.body, symbolize_names: true)
       expect(response).to_not be_successful
       expect(response_data).to have_key(:errors)
-      expect(response_data[:errors].first[:detail]).to include("Could not find Market")
+      expect(response_data[:errors].first[:detail]).to include("Couldn't find Market with 'id'=123123123123")
     end
   end
 end

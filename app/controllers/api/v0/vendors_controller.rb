@@ -1,13 +1,22 @@
 class Api::V0::VendorsController < ApplicationController
-  rescue_from ActiveRecord::RecordNotFound, with: :handle_record_not_found
-
   def index
-    market = Market.find(market_params[:market_id])
-    render json: VendorSerializer.new(market.vendors)
+    begin
+      market = Market.find(market_params[:market_id])
+    rescue
+      render json: ErrorSerializer.serialize("Couldn't find Market with 'id'=#{market_params[:market_id]}"), status: :not_found
+    end
+    if market
+      render json: VendorSerializer.new(market.vendors)
+    end
   end
   
   def show
-    render json: VendorSerializer.new(Vendor.find(params[:id]))
+    begin
+      vendor = Vendor.find(params[:id])
+      render json: VendorSerializer.new(vendor)
+    rescue
+      render json: ErrorSerializer.serialize("Couldn't find Vendor with 'id'=#{params[:id]}"), status: :not_found
+    end
   end
 
   def create
@@ -20,36 +29,39 @@ class Api::V0::VendorsController < ApplicationController
   end
 
   def update
-    vendor = Vendor.find(params[:id])
-    if vendor.update(vendor_params)
-      render json: VendorSerializer.new(vendor), status: :ok
-    else
-      render json: ErrorSerializer.serialize(vendor.errors), status: :bad_request
+    begin
+      vendor = Vendor.find(params[:id])
+    rescue
+      render json: ErrorSerializer.serialize("Couldn't find Vendor with 'id'=#{params[:id]}"), status: :not_found
+    end
+
+    if vendor
+      if vendor.update(vendor_params)
+        render json: VendorSerializer.new(vendor), status: :ok
+      else
+        render json: ErrorSerializer.serialize(vendor.errors), status: :bad_request
+      end
     end
   end
 
   def destroy
-    vendor = Vendor.find(params[:id])
-    vendor.market_vendors.destroy_all
-    vendor.destroy
-    head :no_content
+    begin
+      vendor = Vendor.find(params[:id])
+      vendor.market_vendors.destroy_all
+      vendor.destroy
+      head :no_content
+    rescue
+      render json: ErrorSerializer.serialize("Couldn't find Vendor with 'id'=#{params[:id]}"), status: :not_found
+    end
   end
 
   private
 
   def vendor_params
-    params.require(:vendor).permit(:name, :description, :contact_name, :contact_phone, :credit_accepted)
+    params.require(:vendor).permit(:id, :name, :description, :contact_name, :contact_phone, :credit_accepted)
   end
 
   def market_params
     params.permit(:market_id)
-  end
-  
-  def handle_record_not_found
-    if action_name == 'index'
-      render json: ErrorSerializer.not_found('Market', params[:market_id]), status: :not_found
-    elsif action_name == 'show' || action_name == 'update' || action_name == 'destroy'
-      render json: ErrorSerializer.not_found('Vendor', params[:id]), status: :not_found
-    end
   end
 end

@@ -29,12 +29,12 @@ RSpec.describe "Vendors API", type: :request do
     end
     it "SAD PATH - should return an error when searching for invalid id" do
       vendor = create(:vendor)
-      get "/api/v0/vendors/9009009"
+      get "/api/v0/vendors/123123123123"
       response_data = JSON.parse(response.body, symbolize_names: true)
       vendor_found = response_data
 
       expect(response_data).to have_key(:errors)
-      expect(response_data[:errors].first[:detail]).to eq("Could not find Vendor with 'id'=9009009")
+      expect(response_data[:errors].first[:detail]).to eq("Couldn't find Vendor with 'id'=123123123123")
     end
   end
   describe "5. POST /api/v0/vendors" do
@@ -104,7 +104,7 @@ RSpec.describe "Vendors API", type: :request do
 
       expect(response).to_not be_successful
       expect(result).to have_key(:errors)
-      expect(result[:errors].first[:detail]).to eq("Could not find Vendor with 'id'=123123123123")
+      expect(result[:errors].first[:detail]).to eq("Couldn't find Vendor with 'id'=123123123123")
       expect(Vendor.first.name).to eq(old_name)
       expect(Vendor.first.credit_accepted).to eq(true)
     end
@@ -153,7 +153,7 @@ RSpec.describe "Vendors API", type: :request do
       delete "/api/v0/vendors/123123123123"
       result = JSON.parse(response.body, symbolize_names: true)
 
-      expect(result[:errors].first[:detail]).to eq("Could not find Vendor with 'id'=123123123123")
+      expect(result[:errors].first[:detail]).to eq("Couldn't find Vendor with 'id'=123123123123")
       expect(response).to_not be_successful
       expect(Vendor.first).to eq(vendor)
       expect(Market.first).to eq(market)
