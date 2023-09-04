@@ -32,7 +32,7 @@ RSpec.describe "MarketVendors API", type: :request do
       
       expect(response).to_not be_successful
       expect(response.status).to eq(404)
-      expect(creation_response[:errors][0][:detail]).to eq("Validation failed, Market must exist")
+      expect(creation_response[:errors][0][:detail]).to eq("Validation failed: Market must exist")
 
       vendor = create(:vendor)
       market = create(:market)
@@ -44,7 +44,7 @@ RSpec.describe "MarketVendors API", type: :request do
 
       expect(response).to_not be_successful
       expect(response.status).to eq(404)
-      expect(creation_response[:errors][0][:detail]).to eq("Validation failed, Vendor must exist")
+      expect(creation_response[:errors][0][:detail]).to eq("Validation failed: Vendor must exist")
     end
 
     it "SAD PATH ex2.b If a vendor id and/or a market id are not passed in, a 400 status code as well as a descriptive message should be sent back with the response." do
@@ -58,7 +58,7 @@ RSpec.describe "MarketVendors API", type: :request do
 
       expect(response).to_not be_successful
       expect(response.status).to eq(400)
-      expect(creation_response[:errors][0][:detail]).to eq("Validation failed, Missing parameter: vendor_id")
+      expect(creation_response[:errors][0][:detail]).to eq("Validation failed: Missing Vendor id")
 
       # Do not send market_id
       params = { vendor_id: vendor.id }.to_json
@@ -68,7 +68,7 @@ RSpec.describe "MarketVendors API", type: :request do
 
       expect(response).to_not be_successful
       expect(response.status).to eq(400)
-      expect(creation_response[:errors][0][:detail]).to eq("Validation failed, Missing parameter: market_id")
+      expect(creation_response[:errors][0][:detail]).to eq("Validation failed: Missing Market id")
     end
 
     it "SAD PATH ex3 If there already exists a MarketVendor with that market_id and that vendor_id, a response with a 422 status code and a message informing the client that that association already exists, should be sent back. Looking at custom validation might help to implement a validation for uniqueness of the attributes for this resource." do
@@ -87,7 +87,7 @@ RSpec.describe "MarketVendors API", type: :request do
 
       expect(response).to_not be_successful
       expect(response.status).to eq(422)
-      expect(duplicate_response[:errors][0][:detail]).to eq("Validation failed, Association already exists")
+      expect(duplicate_response[:errors][0][:detail]).to eq("Validation failed: Market vendor asociation between market with market_id=#{market.id} and vendor_id=#{vendor.id} already exists")
     end
   end
 

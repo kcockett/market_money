@@ -24,7 +24,7 @@ class Api::V0::VendorsController < ApplicationController
     if vendor.save
       render json: VendorSerializer.new(vendor), status: :created
     else
-      render json: ErrorSerializer.serialize(vendor.errors), status: :bad_request
+      render json: ErrorSerializer.serialize("Validation failed: Contact name can't be blank, Contact phone can't be blank"), status: :bad_request
     end
   end
 
@@ -39,7 +39,7 @@ class Api::V0::VendorsController < ApplicationController
       if vendor.update(vendor_params)
         render json: VendorSerializer.new(vendor), status: :ok
       else
-        render json: ErrorSerializer.serialize(vendor.errors), status: :bad_request
+        render json: ErrorSerializer.serialize("Validation failed: Contact name can't be blank, Contact phone can't be blank"), status: :bad_request
       end
     end
   end
