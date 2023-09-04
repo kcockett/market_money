@@ -1,4 +1,4 @@
-class MarketsFacade
+class MarketAtmFacade
   attr_reader :atms, :errors, :status
   def initialize(market)
     @market = market

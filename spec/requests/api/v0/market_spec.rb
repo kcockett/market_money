@@ -145,7 +145,7 @@ RSpec.describe "Markets", type: :request do
     end
   end
 
-  describe "6. GET /api/v0/markets/search" do
+  describe "10. GET /api/v0/markets/search" do
     it "should return a response 200 with the market data if these datasets match: [state], [state, city], [state, city, name], [state, name], [name]" do
       market = create(:market)
 
@@ -175,17 +175,17 @@ RSpec.describe "Markets", type: :request do
       expect(response.status).to eq(200)
     end
 
-    it "SAD PATH ex2 The following combination of parameters can NOT be sent in at any time: [city], [city, name].  If an invalid set of parameters are sent in, a proper error message should be sent back, along with a 422 status code." do
+    it "SAD PATH 10 ex2 The following combination of parameters can NOT be sent in at any time: [city], [city, name].  If an invalid set of parameters are sent in, a proper error message should be sent back, along with a 422 status code." do
       market = create(:market)
-
       get "/api/v0/markets/search?city=#{market.city}"
       response_data = JSON.parse(response.body, symbolize_names: true)
-      expect(response_data[:errors].first[:detail]).to include("Validation failed,")
+      
+      expect(response_data[:errors].first[:detail]).to eq("Invalid set of parameters. Please provide a valid set of parameters to perform a search with this endpoint.")
       expect(response.status).to eq(422)
       
       get "/api/v0/markets/search?city=#{market.city}&name=#{market.name}"
       response_data = JSON.parse(response.body, symbolize_names: true)
-      expect(response_data[:errors].first[:detail]).to include("Validation failed,")
+      expect(response_data[:errors].first[:detail]).to eq("Invalid set of parameters. Please provide a valid set of parameters to perform a search with this endpoint.")
       expect(response.status).to eq(422)
     end
   end
