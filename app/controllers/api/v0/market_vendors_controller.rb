@@ -1,22 +1,28 @@
 class Api::V0::MarketVendorsController < ApplicationController
   def create
-    facade = MarketVendorFacade.new(market_vendor_params)
-    if MarketVendor.exists?(market_id: params[:market_id], vendor_id: params[:vendor_id])
-      render_error(["Association already exists"], :unprocessable_entity)
-    elsif facade.create
-      render json: { message: "Successfully added vendor to market" }, status: facade.status
+    if market_vendor_params[:market_id] == nil
+      render json: ErrorSerializer.serialize("Validation failed: Missing Market id"), status: :bad_request
+    elsif market_vendor_params[:vendor_id] == nil
+      render json: ErrorSerializer.serialize("Validation failed: Missing Vendor id"), status: :bad_request
+    elsif MarketVendor.exists?(market_id: market_vendor_params[:market_id], vendor_id: market_vendor_params[:vendor_id])
+      render json: ErrorSerializer.serialize("Validation failed: Market vendor asociation between market with market_id=#{market_vendor_params[:market_id]} and vendor_id=#{market_vendor_params[:vendor_id]} already exists"), status: :unprocessable_entity
+    elsif !Market.exists?(market_vendor_params[:market_id])
+      render json: ErrorSerializer.serialize("Validation failed: Market must exist"), status: :not_found
+    elsif !Vendor.exists?(market_vendor_params[:vendor_id])
+      render json: ErrorSerializer.serialize("Validation failed: Vendor must exist"), status: :not_found
     else
-      render_error(facade.errors, facade.status)
+      MarketVendor.create!(market_id: market_vendor_params[:market_id], vendor_id: market_vendor_params[:vendor_id])
+      render json: { message: "Successfully added vendor to market" }, status: :created
     end
   end
 
   def destroy
-    facade = MarketVendorFacade.new(market_vendor_params)
-  
-    if facade.destroy
+    begin
+      market_vendor = MarketVendor.find_by(vendor_id: market_vendor_params[:vendor_id], market_id: market_vendor_params[:market_id])
+      market_vendor.destroy
       head :no_content
-    else
-      render_error(facade.errors, facade.status)
+    rescue
+      render json: ErrorSerializer.serialize("No record with market_id=#{market_vendor_params[:market_id]} AND vendor_id=#{market_vendor_params[:vendor_id]} exists"), status: :not_found
     end
   end
 
@@ -24,9 +30,5 @@ class Api::V0::MarketVendorsController < ApplicationController
 
   def market_vendor_params
     params.require(:market_vendor).permit(:market_id, :vendor_id)
-  end
-
-  def render_error(errors, status)
-    render json: ErrorSerializer.serialize(errors), status: status
   end
 end

@@ -1,10 +1,10 @@
 require 'rails_helper'
 
-RSpec.describe MarketsFacade do
+RSpec.describe MarketAtmFacade do
   describe '#fetch_nearest_atms' do
     it 'fetches nearest ATMs' do
       market = Market.create!(name: "Orchard Farmers Market", street: "14535 Delaware St", city: "Westminster", county: "Adams", state: "Colorado", zip: 80023, lat: 39.842285, lon: -105.043716) 
-      facade = MarketsFacade.new(market)
+      facade = MarketAtmFacade.new(market)
 
       result = facade.fetch_nearest_atms
 

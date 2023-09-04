@@ -88,6 +88,12 @@ RSpec.describe "Markets", type: :request do
       expect(market_found[:attributes]).to have_key(:vendor_count)
       expect(market_found[:attributes][:vendor_count]).to eq(4)
     end
+    it "SAD PATH ex2 If an invalid market id is passed in, a 404 status as well as a descriptive error message should be sent back in the response." do
+      get "/api/v0/markets/123123123123"
+      response_data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response_data[:errors][0][:detail]).to eq("Couldn't find Market with 'id'=123123123123")
+    end
   end
 
   describe "3. GET /api/v0/markets/:id/vendors" do
@@ -131,15 +137,15 @@ RSpec.describe "Markets", type: :request do
       vendors.each do |vendor|
         MarketVendor.create!(market_id: market.id, vendor_id: vendor.id)
       end
-      get "/api/v0/markets/9009009/vendors"
+      get "/api/v0/markets/123123123123/vendors"
       vendors = JSON.parse(response.body, symbolize_names: true)
       
       expect(vendors).to have_key(:errors)
-      expect(vendors[:errors].first[:detail]).to eq("Could not find Market with 'id'=9009009")
+      expect(vendors[:errors].first[:detail]).to eq("Couldn't find Market with 'id'=123123123123")
     end
   end
 
-  describe "6. GET /api/v0/markets/search" do
+  describe "10. GET /api/v0/markets/search" do
     it "should return a response 200 with the market data if these datasets match: [state], [state, city], [state, city, name], [state, name], [name]" do
       market = create(:market)
 
@@ -169,17 +175,17 @@ RSpec.describe "Markets", type: :request do
       expect(response.status).to eq(200)
     end
 
-    it "SAD PATH ex2 The following combination of parameters can NOT be sent in at any time: [city], [city, name].  If an invalid set of parameters are sent in, a proper error message should be sent back, along with a 422 status code." do
+    it "SAD PATH 10 ex2 The following combination of parameters can NOT be sent in at any time: [city], [city, name].  If an invalid set of parameters are sent in, a proper error message should be sent back, along with a 422 status code." do
       market = create(:market)
-
       get "/api/v0/markets/search?city=#{market.city}"
       response_data = JSON.parse(response.body, symbolize_names: true)
-      expect(response_data[:errors].first[:detail]).to include("Validation failed,")
+      
+      expect(response_data[:errors].first[:detail]).to eq("Invalid set of parameters. Please provide a valid set of parameters to perform a search with this endpoint.")
       expect(response.status).to eq(422)
       
       get "/api/v0/markets/search?city=#{market.city}&name=#{market.name}"
       response_data = JSON.parse(response.body, symbolize_names: true)
-      expect(response_data[:errors].first[:detail]).to include("Validation failed,")
+      expect(response_data[:errors].first[:detail]).to eq("Invalid set of parameters. Please provide a valid set of parameters to perform a search with this endpoint.")
       expect(response.status).to eq(422)
     end
   end
@@ -201,11 +207,11 @@ RSpec.describe "Markets", type: :request do
       expect(response_data[:results].first[:address][:streetName]).to be_a(String)
     end
     it "SAD PATH 404 error" do
-      get "/api/v0/markets/10101010/nearest_atms"
+      get "/api/v0/markets/123123123123/nearest_atms"
       response_data = JSON.parse(response.body, symbolize_names: true)
       expect(response).to_not be_successful
       expect(response_data).to have_key(:errors)
-      expect(response_data[:errors].first[:detail]).to include("Could not find Market")
+      expect(response_data[:errors].first[:detail]).to include("Couldn't find Market with 'id'=123123123123")
     end
   end
 end
