@@ -2,7 +2,7 @@ class Api::V0::VendorsController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, with: :handle_record_not_found
 
   def index
-    market = Market.find(params[:market_id])
+    market = Market.find(market_params[:market_id])
     render json: VendorSerializer.new(market.vendors)
   end
   
@@ -39,6 +39,10 @@ class Api::V0::VendorsController < ApplicationController
 
   def vendor_params
     params.require(:vendor).permit(:name, :description, :contact_name, :contact_phone, :credit_accepted)
+  end
+
+  def market_params
+    params.permit(:market_id)
   end
   
   def handle_record_not_found

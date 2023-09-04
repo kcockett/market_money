@@ -88,6 +88,12 @@ RSpec.describe "Markets", type: :request do
       expect(market_found[:attributes]).to have_key(:vendor_count)
       expect(market_found[:attributes][:vendor_count]).to eq(4)
     end
+    it "SAD PATH ex2 If an invalid market id is passed in, a 404 status as well as a descriptive error message should be sent back in the response." do
+      get "/api/v0/markets/123123123123"
+      response_data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response_data[:errors][0][:detail]).to eq("Couldn't find Market with 'id'=123123123123")
+    end
   end
 
   describe "3. GET /api/v0/markets/:id/vendors" do

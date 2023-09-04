@@ -1,4 +1,14 @@
 class ErrorSerializer
+
+  def initialize(error_message)
+    {
+      errors: [
+        {
+          detail: error_message
+        }
+      ]
+    }
+  end
   def self.serialize(errors)
     if errors.is_a?(String)
       {
