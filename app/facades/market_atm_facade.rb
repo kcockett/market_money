@@ -24,19 +24,9 @@ class MarketAtmFacade
       req.params['radius'] = 5000
       req.params['limit'] = 10
     end
-
-    if response.status == 200
-      @atms = JSON.parse(response.body)
-      @status = :ok
-      true
-    elsif response.status == 404
-      @errors = ["Market not found"]
-      @status = :not_found
-      false
-    else
-      @errors = ["Error fetching ATMs"]
-      @status = :internal_server_error
-      false
-    end
+    
+    @atms = JSON.parse(response.body)
+    @status = :ok
+    true
   end
 end

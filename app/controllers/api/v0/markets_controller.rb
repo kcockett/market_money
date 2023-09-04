@@ -32,17 +32,11 @@ class Api::V0::MarketsController < ApplicationController
       facade = MarketAtmFacade.new(market)
       if facade.fetch_nearest_atms
         render json: { data: facade.atms }, status: :ok
-      else
-        render json: ErrorSerializer.serialize("facade.errors, facade.status"), status: :unprocessable_entity
       end
     end
   end
 
   private
-  
-  def market_params
-    params.require(:market).permit(:name, :street, :city, :county, :state, :zip, :lat, :lon)
-  end
   
   def search_params
     params.permit(:city, :state, :name)
